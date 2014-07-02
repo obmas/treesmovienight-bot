@@ -4,6 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 var SockJS = require('sockjs-client-node');
 var TMNBot = function (options) {
   this.options = _.extend({
+    endpoint: 'http://www.treesmovienight.com/socket',
     sockjs: {
       debug: false
     }
@@ -81,7 +82,7 @@ TMNBot.prototype.connect = function () {
   
   console.log('Connecting...');
 
-  this.sockjs = new SockJS('http://www.treesmovienight.com/socket', null, this.options.sockjs);
+  this.sockjs = new SockJS(this.options.endpoint, ['websocket'], this.options.sockjs);
 
   if (this.sockjs.readyState === SockJS.CLOSING) {
     this.onClose();

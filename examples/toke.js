@@ -1,5 +1,5 @@
 var TMNBot = require('../bot');
-var bot = new TMNBot({username: 'TokeBot', password: '' });
+var bot = new TMNBot({username: 'TokeBot', password: 'youtokeipost' });
 var tokers = [];
 var toking = false;
 var tokeWaitPeriod = 10000;
@@ -23,6 +23,31 @@ var takeAToke = function () {
   toking = false;
 };
 
+var notifyToker = function (user) {
+  bot.call('chat.whisper', {
+    target: user.username,
+    message: 'Awesome! Get ready to take a toke!'
+  });
+};
+
+var addToker = function (user) {
+  var mention = '@"' + user.username + '"';
+  if (toking) {
+    if (tokers.indexOf(mention) === -1) {
+      tokers.push(mention);
+      notifyToker(user);
+    }
+  } else {
+    toking = true;
+    tokers = [mention];
+    bot.call('chat.post', {
+      message: 'A syncronized toke has been started! We\'ll be taking a toke in ' + Math.round(tokeWaitPeriod / 1000) + ' seconds - join in toking by typing !toke'
+    });
+    setTimeout(takeAToke, tokeWaitPeriod);
+    notifyToker(user);
+  }
+};
+
 bot.on('chat', function (event) {
   if (typeof event === 'string') {
     try {
@@ -32,20 +57,12 @@ bot.on('chat', function (event) {
     }
   }
   if (event.type === 'message') {
+    if (event.message === '!toke' || event.message.trim().match(/^@"?TokeBot"? !toke$/) !== null) {
+      addToker(event.user);
+    }
+  } else if (event.type === 'whisper') {
     if (event.message === '!toke') {
-      var username = '@"' + event.user.username + '"';
-      if (toking) {
-        if (tokers.indexOf(username) === -1) {
-          tokers.push(username);
-        }
-      } else {
-        toking = true;
-        tokers = [username];
-        bot.call('chat.post', {
-          message: 'A syncronized toke has been started! Join ' + username + ' by typing !toke'
-        });
-        setTimeout(takeAToke, tokeWaitPeriod);
-      }
+      addToker(event.user);
     }
   }
 })
