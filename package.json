@@ -8,7 +8,9 @@
   },
   "dependencies": {
     "sockjs-client-node": "~0.1.1",
-    "underscore": "~1.6.0"
+    "underscore": "~1.6.0",
+    "jsonfile": "~1.2.0",
+    "repl": "~0.1.3"
   },
   "devDependencies": {},
   "scripts": {
